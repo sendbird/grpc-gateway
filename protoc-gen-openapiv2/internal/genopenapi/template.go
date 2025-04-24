@@ -27,6 +27,8 @@ import (
 	"google.golang.org/protobuf/proto"
 	"google.golang.org/protobuf/types/descriptorpb"
 	"google.golang.org/protobuf/types/known/structpb"
+
+	option "github.com/sendbird"
 )
 
 // The OpenAPI specification does not allow for more than one endpoint with the same HTTP method and path.
@@ -111,13 +113,21 @@ var wktSchemas = map[string]schemaCore{
 func listEnumNames(reg *descriptor.Registry, enum *descriptor.Enum) interface{} {
 	var names []string
 	for _, value := range enum.GetValue() {
+		opts := value.Options
+		ext := proto.GetExtension(opts, option.E_JsonName)
+		if proto.HasExtension(opts, option.E_JsonName) {
+			ext := proto.GetExtension(opts, option.E_JsonName)
+			name = ext.(string)
+		} else {
+			name = value.GetName()
+		}
 		if !isVisible(getEnumValueVisibilityOption(value), reg) {
 			continue
 		}
 		if reg.GetOmitEnumDefaultValue() && value.GetNumber() == 0 {
 			continue
 		}
-		names = append(names, value.GetName())
+		names = append(names, name)
 	}
 
 	if len(names) > 0 {
