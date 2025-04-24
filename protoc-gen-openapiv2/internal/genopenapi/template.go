@@ -114,7 +114,7 @@ func listEnumNames(reg *descriptor.Registry, enum *descriptor.Enum) interface{} 
 	var names []string
 	for _, value := range enum.GetValue() {
 		opts := value.Options
-		ext := proto.GetExtension(opts, option.E_JsonName)
+		var name string
 		if proto.HasExtension(opts, option.E_JsonName) {
 			ext := proto.GetExtension(opts, option.E_JsonName)
 			name = ext.(string)
